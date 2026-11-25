@@ -1,0 +1,118 @@
+---
+import Base from "../layouts/Base.astro";
+import Form from "../components/Form.astro";
+import { site, appointmentForm as af } from "../data/site";
+const tel = (n: string) => `tel:${n.replace(/[^\d+]/g, "")}`;
+---
+
+<Base title="Request an appointment" description="Request a dental appointment at Linden Family Dental. We confirm by phone or text within one business day.">
+  <header class="page-head">
+    <div class="wrap">
+      <h1>Request an appointment</h1>
+      <p class="lede">Tell us what suits you and we'll call or text to confirm a time within one business day. This is a request, not a booking.</p>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap grid">
+      <Form
+        subject={`Appointment request for ${site.name}`}
+        button="Send request"
+        success="Thank you. We'll be in touch within one business day to confirm a time."
+        note="Please don't include medical details here. We'll ask about your health privately at your visit."
+      >
+        <fieldset>
+          <legend>Have you been to our office before?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="patient" value="New patient" required />New patient</label>
+            <label class="choice"><input type="radio" name="patient" value="Existing patient" />Existing patient</label>
+          </div>
+        </fieldset>
+        <div class="field-row">
+          <label class="field"><span>Full name</span><input name="name" autocomplete="name" required /></label>
+          <label class="field"><span>Phone</span><input name="phone" type="tel" autocomplete="tel" required /></label>
+        </div>
+        <div class="field-row">
+          <label class="field"><span>Email</span><input name="email" type="email" autocomplete="email" /></label>
+          <label class="field">
+            <span>Reason for visit</span>
+            <select name="reason">{af.reasons.map((r) => <option>{r}</option>)}</select>
+          </label>
+        </div>
+        <fieldset>
+          <legend>Days that work</legend>
+          <div class="choices">{af.days.map((d) => <label class="choice"><input type="checkbox" name="days" value={d} />{d}</label>)}</div>
+        </fieldset>
+        <fieldset>
+          <legend>Times that work</legend>
+          <div class="choices">{af.times.map((t) => <label class="choice"><input type="checkbox" name="times" value={t} />{t}</label>)}</div>
+        </fieldset>
+        <label class="field"><span>Insurance provider <small>(optional)</small></span><input name="insurance" /></label>
+      </Form>
+      <aside>
+        <div class="card em">
+          <h2>In pain right now?</h2>
+          <p>Don't wait for a reply. Call our emergency line and we'll fit you in today.</p>
+          <a class="btn btn-primary" href={tel(site.emergencyPhone)}>Call {site.emergencyPhone}</a>
+        </div>
+        <div class="card">
+          <h2>Office hours</h2>
+          <dl>{site.hours.map((h) => <div><dt>{h.days}</dt><dd>{h.time}</dd></div>)}</dl>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 64px);
+    align-items: start;
+  }
+  aside {
+    display: grid;
+    gap: 16px;
+  }
+  .card {
+    padding: 24px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+  }
+  .card h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  .em {
+    border-color: rgba(180, 65, 47, 0.3);
+  }
+  .em p {
+    color: var(--ink-2);
+  }
+  .em .btn-primary {
+    background: var(--coral);
+  }
+  .em .btn-primary:hover {
+    background: #9a3727;
+  }
+  dl {
+    margin: 0;
+  }
+  dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 6px;
+    border-top: 1px solid var(--line);
+    font-size: 0.9375rem;
+  }
+  dd {
+    margin: 0;
+  }
+  @media (max-width: 860px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

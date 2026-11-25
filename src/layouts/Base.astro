@@ -1,0 +1,288 @@
+---
+import "@fontsource-variable/lexend";
+import "../styles/global.css";
+import { site, emergency } from "../data/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.description } = Astro.props;
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.tagline}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL("/og.png", Astro.site);
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Dentist",
+  name: site.name,
+  description: site.description,
+  telephone: site.phone,
+  email: site.email,
+  url: Astro.site?.toString(),
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: site.address.street,
+    addressLocality: site.address.city,
+    addressRegion: site.address.region,
+    postalCode: site.address.postal,
+  },
+};
+const links = [
+  { href: "/services", label: "Services" },
+  { href: "/team", label: "Our team" },
+  { href: "/new-patients", label: "New patients" },
+];
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const tel = (n: string) => `tel:${n.replace(/[^\d+]/g, "")}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#f7fafa" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="emergency" role="region" aria-label="Dental emergencies">
+      <div class="wrap em-row">
+        <p>{emergency.text}</p>
+        <a href={tel(site.emergencyPhone)}>Call {site.emergencyPhone}</a>
+      </div>
+    </div>
+    <header class="wrap top">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true">
+          <rect width="28" height="28" rx="8" fill="#0b6e6a"></rect>
+          <path d="M14 6 V22 M14 11 L9 7 M14 11 L19 7 M14 16 L8 12 M14 16 L20 12" stroke="#e6f1ef" stroke-width="1.8" stroke-linecap="round" fill="none"></path>
+        </svg>
+        <span>{site.name}</span>
+      </a>
+      <nav aria-label="Main">
+        <ul>
+          {links.map((l) => <li><a href={l.href} aria-current={path === l.href ? "page" : undefined}>{l.label}</a></li>)}
+        </ul>
+      </nav>
+      <a class="phone" href={tel(site.phone)}>{site.phone}</a>
+      <a class="btn btn-primary btn-sm req" href="/appointment">Request an appointment</a>
+      <details class="menu">
+        <summary>Menu</summary>
+        <ul>
+          {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+          <li><a href="/appointment">Request an appointment</a></li>
+          <li><a href={tel(site.phone)}>Call {site.phone}</a></li>
+        </ul>
+      </details>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="foot">
+      <div class="wrap cols">
+        <div>
+          <p class="fname">{site.name}</p>
+          <p class="muted">{site.address.street}<br />{site.address.city}, {site.address.region} {site.address.postal}</p>
+          <p class="muted"><a href={tel(site.phone)}>{site.phone}</a><br /><a href={`mailto:${site.email}`}>{site.email}</a></p>
+          <p class="muted">{emergency.after}</p>
+        </div>
+        <dl>
+          {site.hours.map((h) => <div><dt>{h.days}</dt><dd>{h.time}</dd></div>)}
+        </dl>
+        <ul>
+          {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+          <li><a href="/appointment">Request an appointment</a></li>
+          {site.social.map((s) => <li><a href={s.url}>{s.label}</a></li>)}
+        </ul>
+      </div>
+      <p class="wrap muted fine">&copy; {new Date().getFullYear()} {site.name}. This website doesn't give medical advice; call us about your situation.</p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .emergency {
+    background: var(--coral);
+    color: #fff;
+    font-size: 0.9375rem;
+  }
+  .em-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px 24px;
+    flex-wrap: wrap;
+    padding-block: 8px;
+  }
+  .em-row p {
+    margin: 0;
+  }
+  .em-row a {
+    color: #fff;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .em-row :focus-visible {
+    outline-color: #fff;
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    min-height: 76px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.125rem;
+    white-space: nowrap;
+  }
+  nav {
+    margin-left: auto;
+  }
+  nav ul {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  nav a,
+  .phone {
+    color: var(--ink-2);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    transition: color 160ms var(--ease);
+  }
+  nav a:hover,
+  nav a[aria-current="page"],
+  .phone:hover {
+    color: var(--ink);
+  }
+  nav a[aria-current="page"] {
+    text-decoration: underline;
+    text-underline-offset: 8px;
+  }
+  .menu {
+    display: none;
+    margin-left: auto;
+    position: relative;
+  }
+  .menu summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 8px 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-control);
+  }
+  .menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .menu ul {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 5;
+    min-width: 240px;
+    list-style: none;
+    margin: 0;
+    padding: 8px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    box-shadow: 0 8px 24px rgba(15, 61, 62, 0.08);
+  }
+  .menu a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .menu a:hover {
+    background: var(--raised);
+  }
+  .foot {
+    background: var(--mint);
+    padding-block: 56px 32px;
+    margin-top: 48px;
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 0.8fr;
+    gap: 40px;
+  }
+  .fname {
+    font-weight: 500;
+    font-size: 1.125rem;
+  }
+  dl {
+    margin: 0;
+  }
+  dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 6px;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.9375rem;
+  }
+  dt {
+    color: var(--ink-2);
+  }
+  dd {
+    margin: 0;
+  }
+  .foot ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+  }
+  .foot ul a {
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .foot ul a:hover {
+    text-decoration: underline;
+  }
+  .fine {
+    margin-top: 40px;
+  }
+  @media (max-width: 1000px) {
+    nav,
+    .phone,
+    .req {
+      display: none;
+    }
+    .menu {
+      display: block;
+    }
+  }
+  @media (max-width: 760px) {
+    .cols {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

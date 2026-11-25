@@ -1,0 +1,182 @@
+---
+import Base from "../layouts/Base.astro";
+import { site, newPatients as np } from "../data/site";
+---
+
+<Base title="New patients" description="Your first visit, forms, insurance we work with, payment options and our membership plan for people without insurance.">
+  <header class="page-head">
+    <div class="wrap">
+      <h1>New patients</h1>
+      <p class="lede">Welcome. Here's how your first visit works, what to bring, and how paying works with or without insurance.</p>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap">
+      <ol class="steps">
+        {np.steps.map((s, i) => (
+          <li>
+            <span class="n">{i + 1}</span>
+            <h2>{s.title}</h2>
+            <p>{s.text}</p>
+          </li>
+        ))}
+      </ol>
+      <div class="two">
+        <div>
+          <h2 class="h">What to bring</h2>
+          <ul class="list">{np.bring.map((b) => <li>{b}</li>)}</ul>
+        </div>
+        <div>
+          <h2 class="h">Forms</h2>
+          <p class="muted">Fill them in at home to save time, or we'll text you a secure link.</p>
+          <ul class="list forms">{np.forms.map((f) => <li><a href={f.url}>{f.name}</a><span class="muted">{f.note}</span></li>)}</ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section ins">
+    <div class="wrap two">
+      <div>
+        <h2 class="h">Insurance we work with</h2>
+        <p class="muted">{np.insuranceNote}</p>
+        <ul class="plans">{np.insurance.map((p) => <li>{p}</li>)}</ul>
+      </div>
+      <div>
+        <h2 class="h">Paying for care</h2>
+        <ul class="list">{np.payment.map((p) => <li>{p}</li>)}</ul>
+        <div class="plan" id="plan">
+          <p class="pname">{np.plan.name}</p>
+          <p class="pprice">{np.plan.price}</p>
+          <p>{np.plan.text}</p>
+          <a class="btn btn-primary btn-sm" href="/appointment">Ask about the plan</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap end">
+      <h2>Ready when you are</h2>
+      <p class="lede">Request a time online or call <a href={`tel:${site.phone.replace(/[^\d+]/g, "")}`}>{site.phone}</a>.</p>
+      <a class="btn btn-primary" href="/appointment">Request an appointment</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .steps {
+    list-style: none;
+    margin: 0 0 64px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .steps li {
+    padding: 20px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+  }
+  .n {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--mint);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 16px;
+  }
+  .steps h2 {
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .steps p {
+    color: var(--ink-2);
+    font-size: 0.9375rem;
+    margin: 0;
+  }
+  .two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px, 6vw, 80px);
+    align-items: start;
+  }
+  .h {
+    font-size: 1.75rem;
+  }
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .list li {
+    padding-block: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .forms li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .forms .muted {
+    margin: 0;
+  }
+  .ins {
+    background: var(--mint);
+  }
+  .plans {
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .plans li {
+    padding: 12px 16px;
+    background: var(--card);
+    border-radius: var(--r-control);
+  }
+  .ins .list li {
+    border-top-color: var(--line-strong);
+  }
+  .plan {
+    margin-top: 32px;
+    padding: 24px;
+    background: var(--card);
+    border-radius: var(--r-card);
+    scroll-margin-top: 24px;
+  }
+  .pname {
+    font-weight: 500;
+    margin-bottom: 0;
+  }
+  .pprice {
+    font-size: 2rem;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .plan p:not(.pname):not(.pprice) {
+    color: var(--ink-2);
+  }
+  .end {
+    text-align: left;
+  }
+  @media (max-width: 900px) {
+    .steps {
+      grid-template-columns: 1fr 1fr;
+    }
+    .two {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 520px) {
+    .steps,
+    .plans {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
